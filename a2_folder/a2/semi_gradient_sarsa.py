@@ -12,10 +12,8 @@ def compute_q_values(state_action_features, weights):
     Returns:
         scalar numpy Q-value
     """
-    # Your code here
     q_vals = np.dot(state_action_features, weights)
-    return q_vals # replace this line
-    # end your code
+    return q_vals
 
 def get_action_values(obs, feature_extractor, weights, num_actions):
     """Applies feature_extractor to observation and produces action values
@@ -60,8 +58,6 @@ class SemiGradientSARSA:
         self.state_buffer = []
         self.action_buffer = []
         self.reward_buffer = []
-        # Your code here: introduce any variables you may need
-        # End your code here
 
     def update_q(self, obs, action, reward, next_obs, next_action, terminated):
 
@@ -85,13 +81,7 @@ class SemiGradientSARSA:
                 G = G + (self.discount ** self.n_step) * np.dot(next_fea, self.w)
     
             curr_fea = self.feature_extractor(obs, action)
-
-
             curr_q =  np.dot(curr_fea, self.w )
-
-            if np.any(np.isnan(G)) or np.any(np.isnan(curr_q)) or np.any(np.isnan(curr_fea)) or np.any(np.isnan(self.w)):
-                import ipdb; ipdb.set_trace()
-
 
             self.w += self.step_size * (G - curr_q) * curr_fea
     
@@ -99,12 +89,10 @@ class SemiGradientSARSA:
     def act(self, obs) -> int:
         """Returns an integer 
         """
-        # Your code here
         self.prev_state = obs
         q_vals = get_action_values(obs, self.feature_extractor, self.w, self.num_actions)
         action = self.explorer.select_action(q_vals) # replace this line
         self.prev_action = action
-        # End your code here
         return action
         
 
@@ -114,12 +102,10 @@ class SemiGradientSARSA:
         Returns:
             None
         """
-        # Your code here
-        state = self.prev_state # replace this line
-        action = self.prev_action # replace this line
-        next_state = obs # replace this line
+        state = self.prev_state
+        action = self.prev_action
+        next_state = obs
 
         
-        next_action = self.act(obs) # replace this line
-        self.update_q(state, action, reward, next_state, next_action, terminated) # keep this line
-        # End your code here
+        next_action = self.act(obs)
+        self.update_q(state, action, reward, next_state, next_action, terminated)

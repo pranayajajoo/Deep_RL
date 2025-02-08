@@ -15,9 +15,8 @@ def agent_environment_episode_loop(agent, env, num_episodes):
         episode_returns.append(episode_return)
         agent.prev_state = None
         agent.prev_action = None
-        ### TODO: remove 
+        # epsilon deacay
         agent.explorer.decay_epsilon()
-        print(f'episode: {episode}, episode_return: {episode_returns[-1:]}')
     return episode_returns
 
 def agent_environment_step_loop(agent, env, num_steps):

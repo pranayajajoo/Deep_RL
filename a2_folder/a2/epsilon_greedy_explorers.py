@@ -34,13 +34,12 @@ class ConstantEpsilonGreedyExploration:
     def __init__(self, epsilon, num_actions, min_epsilon, decay_rate):
         self.epsilon = epsilon
         self.num_actions = num_actions
-        # CHANGED TO DECREASE EPSILON
+        # added to decay epsilon
         self.min_epsilon = min_epsilon
         self.decay_rate = decay_rate
 
     def select_action(self, action_values) -> int:
         max_actions = np.where(action_values == np.max(action_values))[0]
-        # if len(max_actions) == 0: import ipdb;ipdb.set_trace()
         action_probs = compute_epsilon_greedy_action_probs(action_values, self.epsilon)
         return np.random.choice(len(action_probs), p=action_probs)
     

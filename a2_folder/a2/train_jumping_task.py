@@ -92,8 +92,8 @@ def get_env(config_num, render=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", help="Which environment", type=int, choices=[1,2,3], default=1)
-    parser.add_argument("--num-training-episodes", help="How many episodes you want to train your agent", default=10000, type=int) #default 5000
-    parser.add_argument("--num-seeds", help="How many episodes you want to train your agent", default=1, type=int)
+    parser.add_argument("--num-training-episodes", help="How many episodes you want to train your agent", default=5000, type=int) #default 5000
+    parser.add_argument("--num-seeds", help="How many episodes you want to train your agent", default=5, type=int)
     parser.add_argument("--render", action='store_true')
     parser.add_argument("--seed", type=int, default=1)
     args = parser.parse_args()
@@ -115,10 +115,6 @@ if __name__ == '__main__':
     for seed in range(args.num_seeds):
         
         explorer = epsilon_greedy_explorers.ConstantEpsilonGreedyExploration(initial_epsilon, num_actions, min_epsilon, decay_rate)
-
-        # explorer = epsilon_greedy_explorers.ConstantEpsilonGreedyExploration(epsilon, num_actions)
-        # import ipdb; ipdb.set_trace()
-        # epsilon *= 1/max(1, int(np.sum(sarsa_episode_success_list[-1:][-5:]))) #max(1, sum(sarsa_episode_success_list[-1][-5:]))
 
         agent = semi_gradient_sarsa.SemiGradientSARSA(num_features, num_actions, feature_extractor, step_size = 0.03, explorer = explorer, discount = 0.99, initial_weight_value = 10.0, n_step = 7) # initial weight was 10. default
         episode_returns_sarsa = agent_environment.agent_environment_episode_loop(agent, env, args.num_training_episodes)

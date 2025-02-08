@@ -6,7 +6,6 @@ import semi_gradient_sarsa
 import matplotlib.pyplot as plt
 import jumping_task
 from jumping_task.envs import JumpTaskEnv
-# import feature_extraction
 import feature_extraction
 import epsilon_greedy_explorers
 
@@ -93,8 +92,8 @@ def get_env(config_num, render=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", help="Which environment", type=int, choices=[1,2,3], default=1)
-    parser.add_argument("--num-training-episodes", help="How many episodes you want to train your agent", default=5000, type=int) #default 5000
-    parser.add_argument("--num-seeds", help="How many episodes you want to train your agent", default=5, type=int)
+    parser.add_argument("--num-training-episodes", help="How many episodes you want to train your agent", default=10000, type=int) #default 5000
+    parser.add_argument("--num-seeds", help="How many episodes you want to train your agent", default=1, type=int)
     parser.add_argument("--render", action='store_true')
     parser.add_argument("--seed", type=int, default=1)
     args = parser.parse_args()
@@ -103,10 +102,11 @@ if __name__ == '__main__':
     num_actions = env.action_space.n
 
     initial_epsilon = 1.0
-    min_epsilon = 0.0001
+    min_epsilon = 0.000
     decay_rate = 0.995
 
     feature_extractor = feature_extraction.terrible_feature_extractor
+    config=args.config
     num_features = len(feature_extractor(env.reset()[0], 0))
     sarsa_episode_returns_list = []
     sarsa_episode_success_list = []
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         # import ipdb; ipdb.set_trace()
         # epsilon *= 1/max(1, int(np.sum(sarsa_episode_success_list[-1:][-5:]))) #max(1, sum(sarsa_episode_success_list[-1][-5:]))
 
-        agent = semi_gradient_sarsa.SemiGradientSARSA(num_features, num_actions, feature_extractor, step_size = 0.03, explorer = explorer, discount = 0.99, initial_weight_value = 0.0, n_step = 10) # initial weight was 10. default
+        agent = semi_gradient_sarsa.SemiGradientSARSA(num_features, num_actions, feature_extractor, step_size = 0.03, explorer = explorer, discount = 0.99, initial_weight_value = 10.0, n_step = 7) # initial weight was 10. default
         episode_returns_sarsa = agent_environment.agent_environment_episode_loop(agent, env, args.num_training_episodes)
         episode_successes = [1 if episode_return > 140 else 0 for episode_return in episode_returns_sarsa]
         sarsa_episode_returns_list.append(episode_returns_sarsa)

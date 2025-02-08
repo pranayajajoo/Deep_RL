@@ -45,4 +45,4 @@ class ConstantEpsilonGreedyExploration:
         return np.random.choice(len(action_probs), p=action_probs)
     
     def decay_epsilon(self):
-            self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate)
+        self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate)

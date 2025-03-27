@@ -55,7 +55,7 @@ class TD3(object):
     
     def compute_targets(self, batched_rewards, batched_actions, batched_next_states, batched_discounts, batched_terminated):
         with torch.no_grad():
-            noise = self.current_noise # (torch.randn_like(batched_actions) * self.current_noise).clamp(-self.noise_clip, self.noise_clip)
+            noise =  (torch.randn_like(batched_actions) * self.current_noise).clamp(-self.noise_clip, self.noise_clip)
             next_action = (self.actor_target(batched_next_states) + noise).clamp(-self.max_action, self.max_action)
 
             target_Q1, target_Q2 = self.critic_target(batched_next_states, next_action)
@@ -97,12 +97,12 @@ class TD3(object):
     
     def process_transition(self, state, action, reward, next_state, terminated, truncated):
         self.steps += 1
-        state = torch.FloatTensor(state.reshape(1, -1)).to(self.device)
-        action = torch.FloatTensor(action.reshape(1, -1)).to(self.device)
-        next_state = torch.FloatTensor(next_state.reshape(1, -1)).to(self.device)
-        reward = torch.FloatTensor([reward]).to(self.device)
-        terminated = torch.FloatTensor([terminated]).to(self.device)
-        truncated = torch.FloatTensor([truncated]).to(self.device)
+        state = torch.FloatTensor(state.reshape(1, -1))
+        action = torch.FloatTensor(action.reshape(1, -1))
+        next_state = torch.FloatTensor(next_state.reshape(1, -1))
+        reward = torch.FloatTensor([reward])
+        terminated = torch.FloatTensor([terminated])
+        truncated = torch.FloatTensor([truncated])
 
         self.replay_buffer.append(state, action, reward, next_state, terminated, truncated)
 

@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import copy
-from actor import Actor
-from critic import Critic
+from actor import TD3Actor as Actor
+from critic import TD3Critic as Critic
 
 class TD3(object):
     def __init__(
@@ -14,6 +14,7 @@ class TD3(object):
             max_action,
             discount,
             tau,
+            device,
 
             initial_policy_noise,
             decay_steps,
@@ -25,7 +26,6 @@ class TD3(object):
             batch_size,
             replay_buffer
     ):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.actor = Actor(state_dim, action_dim, max_action).to(self.device)
         self.actor_target = copy.deepcopy(self.actor)
@@ -38,9 +38,10 @@ class TD3(object):
         self.max_action = max_action
         self.discount = discount
         self.tau = tau
-        self.initial_policy_noise = initial_policy_noise
-        self.noise_clip = noise_clip
-        self.policy_update_fequency = policy_update_fequency
+        # not annealing policy noise
+        # self.initial_policy_noise = initial_policy_noise
+        # self.noise_clip = noise_clip
+        # self.policy_update_fequency = policy_update_fequency
 
         self.prev_state = None
         self.prav_action = None

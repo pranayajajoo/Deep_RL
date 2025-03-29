@@ -3,8 +3,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import copy
+from torch.distributions.normal import Normal
 
-class Critic(nn.Module):
+def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
+    torch.nn.init.orthogonal_(layer.weight, std)
+    torch.nn.init.constant_(layer.bias, bias_const)
+    return layer
+
+class TD3Critic(nn.Module):
     def __init__(self, state_dim, action_dim):
         super().__init__()
         # Q1
@@ -41,3 +47,18 @@ class Critic(nn.Module):
         q1 = torch.relu(self.l2(q1))
         q1 = self.l3(q1)
         return q1
+    
+
+class PPOCritic(nn.Module):
+    def __init__(self, obs_dim):
+        super().__init__()
+        self.critic = nn.Sequential(
+            layer_init(nn.Linear(obs_dim, 64)),
+            nn.Tanh(),
+            layer_init(nn.Linear(64, 64)),
+            nn.Tanh(),
+            layer_init(nn.Linear(64, 1), std=1.0),
+        )
+
+    def forward(self, x):
+        return self.critic(x)

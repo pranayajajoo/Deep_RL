@@ -114,13 +114,20 @@ class PPO:
         return mb_advantages
     
     def get_action_and_value(self, x, action=None):
-        action_mean = self.actor(x)
-        action_logstd = self.actor.log_std.expand_as(action_mean)
-        action_std = torch.exp(action_logstd)
-        probs = Normal(action_mean, action_std)
+        mean = self.actor.actor_mean(x)
+        std = torch.exp(self.actor.log_std)
+
+        dist = Normal(mean, std)
+
         if action is None:
-            action = probs.sample()
-        return action, probs.log_prob(action).sum(1), probs.entropy().sum(1), self.critic(x)
+            action = dist.sample()
+
+        log_prob = dist.log_prob(action).sum(-1)
+        entropy = dist.entropy().sum(-1)
+        value = self.critic(x)
+
+        return action, log_prob, entropy, value
+
 
     def process_transition(self, advantages, returns, iteration):
         b_obs = self.obs_buf.reshape((-1, self.obs_dim))
@@ -164,9 +171,12 @@ class PPO:
                 # ratio = (new_logprob - b_logprobs[mb_inds]).exp()
 
                 with torch.no_grad():
-                    old_approx_kl = (-ratio.log()).mean()
-                    approx_kl = ((ratio - 1) - ratio.log()).mean()
+                    logratio = newlogprob - b_logprobs[mb_inds]
+                    ratio = logratio.exp()
+                    old_approx_kl = (-logratio).mean()
+                    approx_kl = ((ratio - 1) - logratio).mean()
                     clipfracs += [((ratio - 1.0).abs() > self.clip_coef).float().mean().item()]
+
 
                 mb_advantages = b_advantages[mb_inds]
                 if self.norm_adv:

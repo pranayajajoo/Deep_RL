@@ -178,16 +178,16 @@ if __name__ == '__main__':
 
 
     perf_dict = {}
-    q_val_dict = {}
+    # q_val_dict = {}
     step_dict = {}  # for tracking steps per episode
     for n_step in n_steps:
         perf_dict[n_step] = {}
-        q_val_dict[n_step] = {}
+        # q_val_dict[n_step] = {}
         step_dict[n_step] = {}
         for agent_class in agent_classes:
             agent_text = agent_class_to_text[agent_class]
             alg_returns = []
-            alg_q_values = []
+            # alg_q_values = []
             alg_steps = []
             for seed in range(num_seeds):
                 
@@ -196,15 +196,15 @@ if __name__ == '__main__':
                 # agent = agent_class(state_dim, action_dim, max_action, discount, tau, initial_policy_noise, decay_steps, noise_clip, policy_update_frequency, batch_size, buffer)
                 agent = agent_class(state_dim, action_dim, max_action, device)
                 # step_returns, step_q_values = agent_environment.agent_environment_episode_loop(agent, env, num_training_episodes, args.debug, args.track_q)
-                episode_returns, episode_q_values, steps_per_episode = agent_environment.ppo_agent_environment_step_loop(agent, env, num_training_steps, args.debug, learning_rate=3e-4, gamma=0.99, gae_lambda=0.95, clip_coef=0.2, clip_vloss=True, ent_coef=0.0, vf_coef=0.5, max_grad_norm=0.5, num_steps=2048, num_minibatches=32, update_epochs=10, norm_adv=True, anneal_lr=True, total_timesteps = num_training_steps)
+                episode_returns, steps_per_episode = agent_environment.ppo_agent_environment_step_loop(agent, env, num_training_steps, args.debug, learning_rate=3e-4, gamma=0.99, gae_lambda=0.95, clip_coef=0.2, clip_vloss=True, ent_coef=0.0, vf_coef=0.5, max_grad_norm=0.5, num_steps=2048, num_minibatches=32, update_epochs=10, norm_adv=True, anneal_lr=True, total_timesteps = num_training_steps)
                 alg_returns.append(episode_returns)
-                alg_q_values.append(episode_q_values)
+                # alg_q_values.append(episode_q_values)
                 alg_steps.append(steps_per_episode)
                 # import ipdb; ipdb.set_trace()
 
 
             perf_dict[n_step][agent_text] = alg_returns
-            q_val_dict[n_step][agent_text] = alg_q_values
+            # q_val_dict[n_step][agent_text] = alg_q_values
             step_dict[n_step][agent_text] = alg_steps
             # import ipdb; ipdb.set_trace()
             # plot_alg_results(perf_dict[n_step][agent_text], f"{agent_text}_{n_step}_step_ant.png", label=agent_text)
